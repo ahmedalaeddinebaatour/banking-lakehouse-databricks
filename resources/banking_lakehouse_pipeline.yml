@@ -1,0 +1,61 @@
+resources:
+  jobs:
+    banking_lakehouse_pipeline:
+      name: banking_lakehouse_pipeline
+      tasks:
+        - task_key: 01_ingest_bronze
+          notebook_task:
+            notebook_path: /Workspace/Users/ahmedalaeddinebaatour@gmail.com/banking-lakehouse-databricks/01_ingestion/02_ingest_bronze_autoloader
+            base_parameters:
+              catalog_name: banking_lakehouse
+              environment: dev
+            source: WORKSPACE
+
+        - task_key: 02_silver_clients
+          depends_on:
+            - task_key: 01_ingest_bronze
+          notebook_task:
+            notebook_path: /Workspace/Users/ahmedalaeddinebaatour@gmail.com/banking-lakehouse-databricks/02_silver/03_transform_silver_clients
+            base_parameters:
+              catalog_name: banking_lakehouse
+              environment: dev
+            source: WORKSPACE
+
+        - task_key: 03_silver_transactions
+          depends_on:
+            - task_key: 01_ingest_bronze
+          notebook_task:
+            notebook_path: /Workspace/Users/ahmedalaeddinebaatour@gmail.com/banking-lakehouse-databricks/02_silver/04_transform_silver_transactions
+            base_parameters:
+              catalog_name: banking_lakehouse
+              environment: dev
+            source: WORKSPACE
+
+        - task_key: 04_gold_dim_date
+          notebook_task:
+            notebook_path: /Workspace/Users/ahmedalaeddinebaatour@gmail.com/banking-lakehouse-databricks/03_gold/05_build_dim_date
+            base_parameters:
+              catalog_name: banking_lakehouse
+              environment: dev
+            source: WORKSPACE
+
+        - task_key: 05_gold_dim_client_scd2
+          depends_on:
+            - task_key: 02_silver_clients
+          notebook_task:
+            notebook_path: /Workspace/Users/ahmedalaeddinebaatour@gmail.com/banking-lakehouse-databricks/03_gold/06_build_dim_client_scd2
+            base_parameters:
+              catalog_name: banking_lakehouse
+              environment: dev
+            source: WORKSPACE
+
+        - task_key: 06_gold_fact_transactions
+          depends_on:
+            - task_key: 03_silver_transactions
+            - task_key: 04_gold_dim_date
+          notebook_task:
+            notebook_path: /Workspace/Users/ahmedalaeddinebaatour@gmail.com/banking-lakehouse-databricks/03_gold/07_build_fact_transactions
+            base_parameters:
+              catalog_name: banking_lakehouse
+              environment: dev
+            source: WORKSPACE

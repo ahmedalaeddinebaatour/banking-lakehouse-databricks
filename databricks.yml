@@ -1,0 +1,10 @@
+bundle:
+  name: banking_lakehouse_bundle
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
